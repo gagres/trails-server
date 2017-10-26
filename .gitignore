@@ -1,2 +1,2 @@
 # NodeJS Ignore Modules
-node_modules/
+src/node_modules/

@@ -5,8 +5,7 @@ const express     = require('express'),
       cors        = require('cors') // Habilita Cross-Origin
 
 module.exports = app => {
-    app.set('json spaces', '4');
-    app.set(express.static(__dirname + 'assets'))
+    app.set(express.static(__dirname + 'assets'));
 
     // Configurações da aplicação
     app.use(cors());
