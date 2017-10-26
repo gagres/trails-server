@@ -14,7 +14,7 @@ module.exports = app => {
             const { id } = req.params;
 
             UserModel
-                .findOne(id)
+                .find(id)
                 .then( user => res.json(user) )
                 .catch( err => res.status(500).json(err) );
         }
@@ -28,7 +28,7 @@ module.exports = app => {
             const { id } = req.params;
 
             UserModel
-                .create(req.body)
+                .update(id, req.body)
                 .then( user => res.json(user))
                 .catch( err => res.status(500).json(err) );
         }
@@ -36,7 +36,7 @@ module.exports = app => {
             const { id } = req.params;
             
             UserModel
-                .destroy(id)
+                .remove(id)
                 .then( user => res.json(user) )
                 .catch( err => res.status(500).json(err) );
         }

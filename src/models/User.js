@@ -25,8 +25,6 @@ module.exports = app => {
                 .then( hash => {
                     if(hash !== null)
                         user.passwd = hash;
-                    
-                    console.log(user);
 
                     return connection.query(
                         `INSERT INTO user (name, age, passwd, email, created_at) VALUES (:name, :age, :passwd, :email, NOW())`
@@ -36,21 +34,21 @@ module.exports = app => {
                 .catch( err => console.error(err) );
             
         }
-        update(user) {
+        update(id, user) {
             return this.encryptUserPasswd(user.passwd)
                 .then( hash => {
-                    if(hash !== null)
+                    if(user.passwd !== undefined)
                         user.passwd = hash;
 
                     return connection.queryAsync(
                         `UPDATE user
                         SET name = :name,
                             age = :age,
-                            passwd = :passwd,
+                            ${ user.passwd ? 'passwd = :passwd,' : '' }
                             email = :email,
                             updated_at = NOW()
                         WHERE id = :id`
-                        , Object.assign({}, ...user)
+                        , Object.assign(user, { id })
                     )
                 })
         }
