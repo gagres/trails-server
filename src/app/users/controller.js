@@ -1,7 +1,6 @@
+module.exports = server => {
 
-module.exports = app => {
-
-    const UserModel = app.models.User;
+    const UserModel = server.app.users.User;
 
     class UserCtrl {
         findAll(req, res) {
@@ -10,7 +9,7 @@ module.exports = app => {
                 .then( rows => res.json(rows))
                 .catch( err => res.status(500).json(err) );
         }
-        find(req, res) {
+        findOne(req, res) {
             const { id } = req.params;
 
             UserModel
@@ -19,26 +18,50 @@ module.exports = app => {
                 .catch( err => res.status(500).json(err) );
         }
         create(req, res) {
-            UserModel
-                .create(req.body)
-                .then( user => res.sendStatus(201) )
-                .catch( err => res.status(500).json('Alguma coisa deu errado!') );
-        }
-        update(req, res) {
-            const { id } = req.params;
+            const { name, username, passwd, age, email } = req.query;
 
             UserModel
-                .update(id, req.body)
+                .create({ name, username, passwd, age, email})
+                .then( user => res.sendStatus(201) )
+                .catch( err => res.status(500).json('Alguma coisa deu errado') );
+        }
+        update(req, res) {
+            const { id } = req.params,
+                  { name, username, passwd, age, email } = req.query;
+
+            UserModel
+                .update(id, { name, username, passwd, age, email })
                 .then( user => res.json(user))
                 .catch( err => res.status(500).json(err) );
         }
-        remove(req, res) {
+        ativarUsuario(req, res) {
             const { id } = req.params;
-            
+
             UserModel
-                .remove(id)
-                .then( user => res.json(user) )
+                .mudarStatusUsuario(id, true)
+                .then( succeed => res.json({"data": "Usuário ativado com sucesso"}))
                 .catch( err => res.status(500).json(err) );
+        }
+        inativarUsuario(req, res) {
+            const { id } = req.params;
+
+            UserModel
+                .mudarStatusUsuario(id, false)
+                .then( succeed => res.json({"data": "Usuário inativado com sucesso"}))
+                .catch( err => res.status(500).json(err) );
+        }
+        remove(req, res) {
+            const { id } = req.params,
+                  { passwd } = req.query;
+
+            UserModel
+                .remove(id, passwd)
+                .then( user => {
+                    res.json(user)
+                })
+                .catch( err => {
+                    res.status(500).json(err)
+                });
         }
         login(req, res) {
             const { email, passwd } = req.body;

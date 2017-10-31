@@ -1,20 +1,25 @@
-const express = require('express'),
-      dotenv  = require('dotenv'),
-      consign = require('consign'),
-      http    = require('http');
+const express     = require('express'),
+      environment = require('./environment'),
+      consign     = require('consign'),
+      http        = require('http');
+
+environment(); // Inicializa variáveis de ambiente
 
 let app = express();
 
-// Init dotenv file
-dotenv.config();
-
-consign()
+consign({ locale: "pt-br" })
     .include('configs')
-    .then('models')
-    .then('controllers')
-    .then('routes')
+    .then('helpers')
+    .then('app')
     .into(app);
 
-app.listen(process.env.PORT, () => {
-    console.info(`Aplicação inicializada - Porta: ${ process.env.PORT }`)
+const server = app.listen(process.env.PORT, () => {
+    const host = server.address().address;
+    const port = server.address().port;
+    
+    console.info(
+        `Aplicação inicializada (${ process.env.NODE_ENV }) - Porta: ${ port } - http://${ host }`
+    );
 })
+
+module.exports = app;

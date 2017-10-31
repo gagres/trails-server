@@ -1,7 +1,7 @@
 const express     = require('express'),
       bodyParser  = require('body-parser'), // Módulo que faz parser do body da requisição
       helmet      = require('helmet'), // Módulo que lida com algumas vúlnerabilidades básicas de requisições
-      compression = require('compression') // Utilizado para empacotar as respostas da aplicação em gzip
+      compression = require('compression'), // Utilizado para empacotar as respostas da aplicação em gzip
       cors        = require('cors') // Habilita Cross-Origin
 
 module.exports = app => {
