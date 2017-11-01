@@ -1,5 +1,5 @@
 const dotenv = require('dotenv'),
-      path   = require('path')
+      path   = require('path');
 
 module.exports = () => {
     let dotfile;

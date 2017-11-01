@@ -9,7 +9,12 @@ module.exports = app => {
             bluebird.promisify(this.encryptUserPasswd); // Transforma a função em uma promisse
         }
         findAll() {
-            return connection.queryAsync('SELECT id, name, username, age FROM user');
+            return connection.queryAsync(`
+                SELECT id, name, username, age 
+                FROM user
+                ORDER BY id DESC
+                LIMIT
+            `);
         }
         find(id) {
             return connection.queryAsync(
@@ -26,11 +31,17 @@ module.exports = app => {
                         user.passwd = hash;
 
                     return connection.query(
-                        `INSERT INTO user (name, username, age, passwd, email, dtin) VALUES (:name, :username, :age, :passwd, :email, NOW())`
+                        `INSERT INTO user (name, username, age, passwd, email, dtin) 
+                         VALUES (:name, :username, :age, :passwd, :email, NOW())`
                         , user
                     )
-                })
-                .catch( err => console.error(err) );
+                    .then(result => {
+                        if(result.affectedRows != 1)
+                            return { "message": "Ocorreu um erro ao tentar criar o usuário" };
+
+                        return { data: "Usuário criado com sucesso" };
+                    })
+                });
             
         }
         update(id, user) {

@@ -6,7 +6,6 @@
   "scripts": {
     "start": "node_modules/.bin/nodemon app.js",
     "test": "mocha 'test/**/*.js' --timeout 10000",
-    "lint": "node_modules/.bin/standard && node app.js",
     "check": "node_modules/.bin/nsp check"
   },
   "repository": {
@@ -36,7 +35,8 @@
     "helmet": "^3.9.0",
     "joi": "^13.0.1",
     "morgan": "^1.9.0",
-    "mysql": "^2.15.0"
+    "mysql": "^2.15.0",
+    "serve-favicon": "^2.4.5"
   },
   "devDependencies": {
     "chai": "^4.1.2",

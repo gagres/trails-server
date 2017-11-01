@@ -22,8 +22,8 @@ module.exports = server => {
 
             UserModel
                 .create({ name, username, passwd, age, email})
-                .then( user => res.sendStatus(201) )
-                .catch( err => res.status(500).json('Alguma coisa deu errado') );
+                .then( user => res.json(user) )
+                .catch( err => res.status(500).json({ err, message: 'Não foi possível criar o usuário' }) );
         }
         update(req, res) {
             const { id } = req.params,
@@ -32,23 +32,23 @@ module.exports = server => {
             UserModel
                 .update(id, { name, username, passwd, age, email })
                 .then( user => res.json(user))
-                .catch( err => res.status(500).json(err) );
+                .catch( err => res.status(500).json({ err, message: 'Não foi possível atualizar o usuário' }) );
         }
         ativarUsuario(req, res) {
             const { id } = req.params;
 
             UserModel
                 .mudarStatusUsuario(id, true)
-                .then( succeed => res.json({"data": "Usuário ativado com sucesso"}))
-                .catch( err => res.status(500).json(err) );
+                .then( succeed => res.json(data) )
+                .catch( err => res.status(500).json({ err, message: 'Erro ao ativar o desejado desejado' }) );
         }
         inativarUsuario(req, res) {
             const { id } = req.params;
 
             UserModel
                 .mudarStatusUsuario(id, false)
-                .then( succeed => res.json({"data": "Usuário inativado com sucesso"}))
-                .catch( err => res.status(500).json(err) );
+                .then( succeed => res.json( succeed ))
+                .catch( err => res.status(500).json({ err, message: 'Erro ao inativar o usuário desejado' }) );
         }
         remove(req, res) {
             const { id } = req.params,
@@ -56,12 +56,8 @@ module.exports = server => {
 
             UserModel
                 .remove(id, passwd)
-                .then( user => {
-                    res.json(user)
-                })
-                .catch( err => {
-                    res.status(500).json(err)
-                });
+                .then( user => res.json(user) )
+                .catch( err => res.status(500).json({ err, message: 'Não foi possível remover o funcionário'}) );
         }
         login(req, res) {
             const { email, passwd } = req.body;
@@ -69,8 +65,7 @@ module.exports = server => {
             UserModel
                 .login(email)
                 .then(user => {
-                    if (user.length) 
-                    {
+                    if (user.length) {
                         const hash = user[0].passwd;
                         
                         UserModel.verifyUserPasswd(passwd, hash)
