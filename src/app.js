@@ -17,6 +17,8 @@ const server = app.listen(process.env.PORT, () => {
     const host = server.address().address;
     const port = server.address().port;
     
+    console.log(server, process.env);
+
     console.info(
         `Aplicação inicializada (${ process.env.NODE_ENV }) - Porta: ${ port } - http://${ host }`
     );

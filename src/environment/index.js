@@ -12,8 +12,6 @@ module.exports = () => {
             dotfile = '.dev.env';
     }
 
-    console.log(dotfile);
-
     // Init dotenv file
     dotenv.config({ path: path.resolve(__dirname, dotfile) });
 }
