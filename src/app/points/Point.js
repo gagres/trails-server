@@ -6,12 +6,12 @@ module.exports = app => {
     class PointModel {
         getAllByTrail(id) {
             return connection.query(`
-                SELECT id, latitude, longitude, autitude, created_at, updated_at
-                FROM trail_point
-                WHERE trail_id = :id
+                SELECT pointID, latitude, longitude, dtstamp
+                FROM PointOfTrail
+                WHERE trailID = :id
             `, { id });
         }
-        createPoints(trail_id, points) {
+        createPoints(trailID, points) {
             return new bluebird.Promise( (resolve, reject) => {
                 connection.beginTransaction( (err) => {
                     if(err) reject(err);
@@ -21,9 +21,9 @@ module.exports = app => {
                     for(let point of points) {
                         pointPromises.push(
                             connection.queryAsync(`
-                                INSERT INTO trail_point (latitude, longitude, autitude, trail_id, dtin)
-                                VALUES (:latitude, :longitude, :autitude, :trail_id, NOW())
-                            `, Object.assign(point, { trail_id }))
+                                INSERT INTO PointOfTrail (latitude, longitude, trailID, dtstamp)
+                                VALUES (:latitude, :longitude, :autitude, :trailID, NOW())
+                            `, Object.assign(point, { trailID }))
                         )
                     }
     
@@ -42,7 +42,7 @@ module.exports = app => {
                 })
             })
         }
-        createInterestPoints(trail_id, interest_points) {
+        createInterestPoints(trailID, interest_points) {
             return new bluebird.Promise( (resolve, reject) => {
                 connection.beginTransaction( (err) => {
                     if(err) reject(err);
@@ -52,9 +52,9 @@ module.exports = app => {
                     for(let point of interest_points) {
                         pointPromises.push(
                             connection.queryAsync(`
-                                INSERT INTO point_interest (latitude, longitude, trail_id, point_type_id, dtin)
-                                VALUES (:latitude, :longitude, :trail_id, :point_type_id, NOW())
-                            `, Object.assign(point, { trail_id }))
+                                INSERT INTO point_interest (latitude, longitude, trailID, pointTypeID, dtstamp)
+                                VALUES (:latitude, :longitude, :trailID, :pointTypeID, NOW())
+                            `, Object.assign(point, { trailID }))
                         )
                     }
     

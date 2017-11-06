@@ -2,11 +2,11 @@ module.exports = server => {
     const PointModel = server.app.points.Point;
 
     class PointCtrl {
-        createPoints(id_trail, points) {
-            return PointModel.createPoints(id_trail, points);
+        createPoints(trailID, points) {
+            return PointModel.createPoints(trailID, points);
         }
-        createInterestPoints(id_trail, interest_points) {
-            return PointModel.createInterestPoints(id_trail, interest_points);
+        createInterestPoints(trailID, interest_points) {
+            return PointModel.createInterestPoints(trailID, interest_points);
         }
     }
 

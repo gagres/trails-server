@@ -5,42 +5,44 @@ module.exports = server => {
     
     class TrailModel {
         getAll(queryParams) {
-            let sql = `SELECT id, trailname, traildist, trailtime, trailrat
-                       FROM trail
+            let sql = `SELECT trailID, trailname, traildist, trailtime, trailrat
+                       FROM Trail
                        WHERE 1 = 1 `;
 
             if(queryParams.trailname) 
                 sql += "AND trailname LIKE '%:trailname%'";
 
-            if(queryParams.id)
-                sql += "AND id = :id";
+            if(queryParams.trailID)
+                sql += "AND trailID = :trailID";
 
-            if(queryParams.user_id)
-                sql += "AND user_id = :user_id"
+            if(queryParams.userID)
+                sql += "AND userID = :userID"
 
             return connection.queryAsync(sql);
         }
-        getOne(id) {
+        getOne(trailID) {
             return connection.queryAsync(`
-                SELECT trail.id, 
-                       trail.trailname, 
-                       trail.traildist,
-                       trail.trailtime, 
-                       trail.trailrat,
-                       trail.traildescr,
+                SELECT Trail.trailID, 
+                       Trail.trailname, 
+                       Trail.traildist,
+                       Trail.trailtime, 
+                       Trail.trailrat,
+                       Trail.traildescr,
+                       Trail.mainlat,
+                       Trail.mainlong,
                        user.name as user,
-                       trail.dtin,
-                       trail.dtstamp
-                FROM trail
-                INNER JOIN user ON user.id = trail.user_id
-                WHERE trail.id = :id`
-                , { id }
+                       Trail.dtin,
+                       Trail.dtstamp
+                FROM Trail
+                INNER JOIN user ON user.trailID = Trail.userID
+                WHERE Trail.trailID = :trailID`
+                , { trailID }
             )
         }
         create(trail) {
             return connection.queryAsync(`
-                INSERT INTO trail (trailname, traildist, trailtime, trailrat, traildescr, user_id, dtin)
-                VALUES (:trailname, :traildist, :trailtime, :trailrat, :traildescr, :user_id, NOW())`
+                INSERT INTO Trail (trailname, traildist, trailtime, trailrat, traildescr, userID, dtin)
+                VALUES (:trailname, :traildist, :trailtime, :trailrat, :traildescr, :userID, NOW())`
                 , trail)
             .then( (trail) => {
                 if(trail.insertId) 
@@ -49,22 +51,22 @@ module.exports = server => {
                 return {"message": "Não foi possível criar a trilha"}
             })
         }
-        update(id, trail) {
+        update(trailID, trail) {
             return connection.queryAsync(`
-                UPDATE trail
+                UPDATE Trail
                 SET trailname  = :trailname,
                     traildist  = :traildist,
                     trailtime  = :trailtime,
                     trailrat   = :trailrat,
                     traildescr = :traildescr
                     dtstamp    = NOW()
-                WHERE id = :id 
-            `, Object.assign(trail, { id }));
+                WHERE trailID = :trailID 
+            `, Object.assign(trail, { trailID }));
         }
-        remove(id) {
+        remove(trailID) {
             return connection.queryAsync(`
-                DELETE FROM trail WHERE id = :id`
-                , { id }
+                DELETE FROM Trail WHERE trailID = :trailID`
+                , { trailID }
             )
         }
     }

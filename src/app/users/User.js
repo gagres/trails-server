@@ -13,7 +13,6 @@ module.exports = app => {
                 SELECT id, name, username, age 
                 FROM user
                 ORDER BY id DESC
-                LIMIT
             `);
         }
         find(id) {
