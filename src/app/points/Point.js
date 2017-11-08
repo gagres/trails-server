@@ -1,16 +1,7 @@
-const bluebird = require('bluebird');
+const { TYPES } = require('tedious');
 
-module.exports = app => {
-    const connection = app.connection;
-    
+module.exports = server => {
     class PointModel {
-        getAllByTrail(id) {
-            return connection.query(`
-                SELECT pointID, latitude, longitude, dtstamp
-                FROM PointOfTrail
-                WHERE trailID = :id
-            `, { id });
-        }
         createPoints(trailID, points) {
             return new bluebird.Promise( (resolve, reject) => {
                 connection.beginTransaction( (err) => {

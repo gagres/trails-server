@@ -6,67 +6,69 @@ module.exports = server => {
         findAll(req, res) {
             UserModel
                 .findAll()
-                .then( rows => res.json(rows))
-                .catch( err => res.status(500).json(err) );
+                .then( ({ count, rows }) => {
+                    res.json({ count, rows })
+                })
+                .catch( err => res.json(err) );
         }
         findOne(req, res) {
-            const { id } = req.params;
+            const { userID } = req.params;
 
             UserModel
-                .find(id)
+                .find(userID)
                 .then( user => res.json(user) )
-                .catch( err => res.status(500).json(err) );
+                .catch( err => res.json(err) );
         }
         create(req, res) {
-            const { name, username, passwd, age, email } = req.query;
+            const { realname, username, passwd, age, email } = req.query;
 
             UserModel
-                .create({ name, username, passwd, age, email})
-                .then( user => res.json(user) )
-                .catch( err => res.status(500).json({ err, message: 'Não foi possível criar o usuário' }) );
+                .create({ realname, username, passwd, age, email})
+                .then( completed => res.json(completed) )
+                .catch( err => res.json(err) );
         }
         update(req, res) {
-            const { id } = req.params,
-                  { name, username, passwd, age, email } = req.query;
+            const { userID } = req.params,
+                  { realname, username, passwd, age, email } = req.query;
 
             UserModel
-                .update(id, { name, username, passwd, age, email })
-                .then( user => res.json(user))
-                .catch( err => res.status(500).json({ err, message: 'Não foi possível atualizar o usuário' }) );
+                .update(userID, { realname, username, passwd, age, email })
+                .then( completed => res.json(completed) )
+                .catch( err => res.json(err) );
         }
         ativarUsuario(req, res) {
-            const { id } = req.params;
+            const { userID } = req.params;
 
             UserModel
-                .mudarStatusUsuario(id, true)
+                .mudarStatusUsuario(userID, 1)
                 .then( succeed => res.json(data) )
-                .catch( err => res.status(500).json({ err, message: 'Erro ao ativar o desejado desejado' }) );
+                .catch( err => res.json(err) );
         }
         inativarUsuario(req, res) {
-            const { id } = req.params;
+            const { userID } = req.params;
 
             UserModel
-                .mudarStatusUsuario(id, false)
-                .then( succeed => res.json( succeed ))
-                .catch( err => res.status(500).json({ err, message: 'Erro ao inativar o usuário desejado' }) );
+                .mudarStatusUsuario(userID, 0)
+                .then( succeed => res.json(succeed) )
+                .catch( err => res.json(err) );
         }
         remove(req, res) {
-            const { id } = req.params,
+            const { userID } = req.params,
                   { passwd } = req.query;
 
             UserModel
-                .remove(id, passwd)
-                .then( user => res.json(user) )
-                .catch( err => res.status(500).json({ err, message: 'Não foi possível remover o funcionário'}) );
+                .remove(userID, passwd)
+                .then( succeed => res.json(succeed) )
+                .catch( err => res.json(err) );
         }
         login(req, res) {
             const { email, passwd } = req.body;
             
             UserModel
                 .login(email)
-                .then(user => {
-                    if (user.length) {
-                        const hash = user[0].passwd;
+                .then( ({ count, rows }) => {
+                    if (rows.length) {
+                        const hash = rows[0].passwd;
                         
                         UserModel.verifyUserPasswd(passwd, hash)
                             .then( isEquals => {
@@ -77,11 +79,11 @@ module.exports = server => {
                             });
                     } else
                         return res.json({ "message": "E-mail não encontrado" });
-                    
+
                 })
                 .catch(err => {
                     console.log(err);
-                    res.status(500).json({"error": "Erro interno do servidor"})
+                    res.json(err)
                 });
 
         }

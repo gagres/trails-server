@@ -1,27 +1,33 @@
-const bluebird = require('bluebird');
+const bluebird  = require('bluebird'),
+      { TYPES } = require('tedious');
 
-module.exports = app => {
-    const connection = app.connection,
-          password   = app.helpers.password;
+module.exports = server => {
+    const connection     = server.connection,
+          PasswordHelper = server.helpers.password;
+          RequestHelper  = server.helpers.request;
     
     class UserModel {
         constructor() {
+            this.connection = server.connection; // Conexão com a base de dados
             bluebird.promisify(this.encryptUserPasswd); // Transforma a função em uma promisse
         }
         findAll() {
-            return connection.queryAsync(`
-                SELECT id, name, username, age 
-                FROM user
-                ORDER BY id DESC
-            `);
+            const sql = `
+                SELECT userID, realname, username, age, email
+                FROM TrailUser`;
+
+            return RequestHelper.requestToPromise(this.connection.Request(sql));
         }
         find(id) {
-            return connection.queryAsync(
-                `SELECT id, name, username, email, age, dtin, dtstamp
-                FROM user
-                WHERE id = :id`,
-                { id }
-            )
+            const sql = `
+                SELECT userID, realname, username, age, email, dtin, dtstamp, active, decription
+                FROM TrailUser
+                WHERE userID = @userID`;
+
+            const request = this.connection.Request(sql)
+                                .addParam('userID', TYPES.Int, id);
+
+            return RequestHelper.requestToPromise(request);
         }
         create(user) {
             return this.encryptUserPasswd(user.passwd)
@@ -29,78 +35,80 @@ module.exports = app => {
                     if(hash !== null)
                         user.passwd = hash;
 
-                    return connection.query(
-                        `INSERT INTO user (name, username, age, passwd, email, dtin) 
-                         VALUES (:name, :username, :age, :passwd, :email, NOW())`
-                        , user
-                    )
-                    .then(result => {
-                        if(result.affectedRows != 1)
-                            return { "message": "Ocorreu um erro ao tentar criar o usuário" };
+                    const sql = `
+                        INSERT INTO TrailUser (realname, username, age, passwd, email, dtin, decription) 
+                        VALUES (@realname, @username, @age, @passwd, @email, CURRENT_TIMESTAMP, '')`;
 
-                        return { data: "Usuário criado com sucesso" };
-                    })
+                    const request = this.connection.Request(sql)
+                                        .addParam('realname', TYPES.VarChar, user.realname)
+                                        .addParam('username', TYPES.VarChar, user.username)
+                                        .addParam('age', TYPES.Int, user.age)
+                                        .addParam('passwd', TYPES.VarChar, user.passwd)
+                                        .addParam('email', TYPES.VarChar, user.email);
+                    
+                    return RequestHelper.requestToPromise(request);
                 });
             
         }
         update(id, user) {
             return this.encryptUserPasswd(user.passwd)
                 .then( hash => {
-                    if(user.passwd !== undefined)
-                        user.passwd = hash;
+                    
+                    const sql = `
+                        UPDATE TrailUser
+                        SET realname = @realname,
+                            username = @username,
+                            age = @age,
+                            ${ user.passwd ? 'passwd = @passwd,' : '' }
+                            email = @email,
+                            dtstamp = CURRENT_TIMESTAMP
+                        WHERE userID = @userID`;
 
-                    return connection.queryAsync(
-                        `UPDATE user
-                        SET name = :name,
-                            age = :age,
-                            ${ user.passwd ? 'passwd = :passwd,' : '' }
-                            email = :email,
-                            dtstamp = NOW()
-                        WHERE id = :id`
-                        , Object.assign(user, { id })
-                    )
+                    let request = this.connection.Request(sql)
+                                        .addParam('realname', TYPES.VarChar, user.realname)
+                                        .addParam('username', TYPES.VarChar, user.username)
+                                        .addParam('age', TYPES.Int, user.age)
+                                        .addParam('email', TYPES.VarChar, user.email)
+                                        .addParam('userID', TYPES.Int, id);
+                    
+                    if(user.passwd !== undefined) {
+                        user.passwd = hash;
+                        request.addParam('passwd', TYPES.VarChar, user.passwd);
+                    }
+
+                    return RequestHelper.requestToPromise(request);
                 })
         }
         remove(id, passwd) {
-            return connection
-                .queryAsync(`SELECT passwd FROM user WHERE id = :id`, { id })
-                .then((user) => {
+            const sql = `SELECT passwd FROM TrailUser WHERE userID = @userID`;
 
-                    let message = ''; // Mensagem de retorno se algo der errado
+            const request = this.connection.Request(sql)
+                                .addParam('userID', TYPES.Int, id);
 
-                    if(user.length > 0) {
-                        if(this.verifyUserPasswd(passwd, user[0].passwd)) {
-                            return connection.queryAsync(`
-                                DELETE FROM user WHERE id = :id
-                            `, { id })
-                        } else {
-                            message = 'Senha inválida'
-                        }
-                    } else {
-                        message = 'O usuário não foi encontrado';
-                    }
-
-                    return new bluebird.Promise( (resolve, reject) => {
-                        resolve({ message })
-                    })
-                })
+            return RequestHelper.requestToPromise(request);
         }
         login(email) {
-            return connection.queryAsync(`
-                SELECT passwd FROM user WHERE email = :email`
-                , { email }
-            );
+            const sql = `SELECT passwd FROM TrailUser WHERE email = @email`;
+
+            const request = this.connection.Request(sql)
+                                .addParam('email', TYPES.VarChar, email);
+
+            return RequestHelper.requestToPromise(request);
         }
         mudarStatusUsuario(id, status) {
-            return connection.queryAsync(`
-                UPDATE user SET active = :status WHERE id = :id
-            `, { status, id });
+            const sql = `UPDATE TrailUser SET active = @active WHERE userID = @userID`;
+            
+            const request = this.connection.Request(sql)
+                                .addParam('active', TYPES.Bit, status)
+                                .addParam('userID', TYPES.Int, id);
+            
+            return RequestHelper.requestToPromise(request);
         }
         encryptUserPasswd(passwd) {
-            return password.encrypt(passwd)
+            return PasswordHelper.encrypt(passwd)
         }
         verifyUserPasswd(passwd, hash) {
-            return password.compare(passwd, hash);
+            return PasswordHelper.compare(passwd, hash);
         }
     }
 

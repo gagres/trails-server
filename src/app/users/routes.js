@@ -5,13 +5,13 @@ module.exports = server => {
         .get(UserCtrl.findAll)
         .post(UserCtrl.create);
     
-    server.route('/user/:id')
+    server.route('/user/:userID')
         .get(UserCtrl.findOne)
         .put(UserCtrl.update)
         .delete(UserCtrl.remove);
 
-    server.get('/user/:id/ativar', UserCtrl.ativarUsuario);
-    server.get('/user/:id/inativar', UserCtrl.inativarUsuario);
+    server.get('/user/:userID/ativar', UserCtrl.ativarUsuario);
+    server.get('/user/:userID/inativar', UserCtrl.inativarUsuario);
 
     server.post('/login', UserCtrl.login);
 }
