@@ -1,6 +1,6 @@
 
 module.exports = server => {
-    const TrailCtrl = server.app.trails.controller;
+    const TrailCtrl = server.controllers.trail;
 
     server
         .route('/trails')

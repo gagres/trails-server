@@ -5,12 +5,16 @@ const express     = require('express'),
 
 environment(); // Inicializa variáveis de ambiente
 
+process.env.PORT = process.env.PORT || 3000
+
 let app = express();
 
 consign({ locale: "pt-br" })
     .include('configs')
     .then('helpers')
-    .then('app')
+    .then('models')
+    .then('controllers')
+    .then('routes')
     .into(app);
 
 const server = app.listen(process.env.PORT, () => {

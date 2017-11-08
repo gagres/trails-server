@@ -1,8 +1,8 @@
-const bluebird = require('bluebird');
+const bluebird   = require('bluebird');
 
 module.exports = server => {
-    const TrailModel = server.app.trails.Trail,
-          PointCtrl  = server.app.points.controller;
+    const PointModel  = server.models.point,
+          TrailModel = server.models.trail;
     
     class TrailCtrl {
         findAll(req, res) {
@@ -32,8 +32,8 @@ module.exports = server => {
                         return trail;
                     
                     return bluebird.all(
-                        PointCtrl.createPoints(trail.data, trail_points),
-                        PointCtrl.createInterestPoints(trail.data, interest_points)
+                        PointModel.createPoints(trail.data, trail_points),
+                        PointModel.createInterestPoints(trail.data, interest_points)
                     );
                 })
                 .then( succeed => res.status(201).json(succeed) )

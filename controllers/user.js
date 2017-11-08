@@ -1,6 +1,5 @@
 module.exports = server => {
-
-    const UserModel = server.app.users.User;
+    const UserModel = server.models.user;
 
     class UserCtrl {
         findAll(req, res) {

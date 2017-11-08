@@ -36,8 +36,8 @@ module.exports = server => {
                         user.passwd = hash;
 
                     const sql = `
-                        INSERT INTO TrailUser (realname, username, age, passwd, email, dtin, decription) 
-                        VALUES (@realname, @username, @age, @passwd, @email, CURRENT_TIMESTAMP, '')`;
+                        INSERT INTO TrailUser (realname, username, age, passwd, email, dtin, dtstamp, decription) 
+                        VALUES (@realname, @username, @age, @passwd, @email, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '')`;
 
                     const request = this.connection.Request(sql)
                                         .addParam('realname', TYPES.VarChar, user.realname)

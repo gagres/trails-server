@@ -1,5 +1,5 @@
 module.exports = server => {
-    const UserCtrl = server.app.users.controller;
+    const UserCtrl = server.controllers.user;
 
     server.route('/users')
         .get(UserCtrl.findAll)
