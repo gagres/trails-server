@@ -4,10 +4,13 @@ const express     = require('express'),
       helmet      = require('helmet'), // Módulo que lida com algumas vúlnerabilidades básicas de requisições
       compression = require('compression'), // Utilizado para empacotar as respostas da aplicação em gzip
       cors        = require('cors'), // Habilita Cross-Origin
-      logger      = require('morgan'); // Logger from routes
+      logger      = require('morgan'), // Logger from routes
+      path        = require('path');
 
 module.exports = app => {
-    app.set(express.static(__dirname + 'assets'));
+
+    app.set(express.static(__dirname + '/assets'));
+    app.use('/apidoc', express.static(path.resolve(__dirname, '../', 'apidoc/')));
 
     // Configurações da aplicação
     app.use(cors());

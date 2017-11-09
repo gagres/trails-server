@@ -2,12 +2,14 @@
   "name": "trails-server",
   "version": "1.0.0",
   "description": "API to Trails Makers APP",
+  "url" : "https://localhost:3000/",
   "main": "index.js",
   "scripts": {
     "start": "node_modules/.bin/nodemon app.js",
     "start_production": "export NODE_PUBLIC_IPV4=curl http://169.254.169.254/latest/meta-data/ && npm start",
     "test": "mocha 'test/**/*.js' --timeout 10000",
-    "check": "node_modules/.bin/nsp check"
+    "check": "node_modules/.bin/nsp check",
+    "doc": "apidoc -i controllers/ -o apidoc/"
   },
   "repository": {
     "type": "git",
@@ -40,6 +42,7 @@
     "tedious": "^2.1.1"
   },
   "devDependencies": {
+    "apidoc": "^0.17.6",
     "chai": "^4.1.2",
     "chai-http": "^3.0.0",
     "jshint": "^2.9.5",

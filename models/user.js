@@ -19,7 +19,7 @@ module.exports = server => {
         }
         find(id) {
             const sql = `
-                SELECT userID, realname, username, age, email, dtin, dtstamp, active, decription
+                SELECT userID, realname, username, age, email, dtin, dtstamp, active, decription as 'description'
                 FROM TrailUser
                 WHERE userID = @userID`;
 

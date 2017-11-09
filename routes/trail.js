@@ -8,7 +8,7 @@ module.exports = server => {
         .post(TrailCtrl.create);
 
     server
-        .route('/trail/:id')
+        .route('/trail/:trailID')
         .get(TrailCtrl.findOne)
         .put(TrailCtrl.update)
         .delete(TrailCtrl.remove)
