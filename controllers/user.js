@@ -15,7 +15,19 @@ module.exports = server => {
 
             UserModel
                 .find(userID)
-                .then( user => res.json(user) )
+                .then( user => {
+                    if(user.count) {
+                        return UserModel
+                            .findFollowFriends(userID)
+                            .then( follows => {
+                                user.rows[0].following = follows.rows;
+
+                                res.json(user);
+                            })
+                    }
+                    
+                    res.json(user);
+                })
                 .catch( err => res.json(err) );
         }
         create(req, res) {
@@ -40,7 +52,7 @@ module.exports = server => {
 
             UserModel
                 .mudarStatusUsuario(userID, 1)
-                .then( succeed => res.json(data) )
+                .then( succeed => res.json(succeed) )
                 .catch( err => res.json(err) );
         }
         inativarUsuario(req, res) {
@@ -85,6 +97,15 @@ module.exports = server => {
                     res.json(err)
                 });
 
+        }
+        followOtherUser(req, res) {
+            const { priUserID } = req.params,
+                  { userID }    = req.query;
+
+            UserModel
+                .followOtherUser(userID, priUserID)
+                .then( succeed => res.json(succeed) )
+                .catch( err => res.json(err) );
         }
 
     }

@@ -1,73 +1,81 @@
-const bluebird = require('bluebird');
+const bluebird  = require('bluebird'),
+      { TYPES } = require('tedious'); 
 
 module.exports = server => {
-    const connection = server.connection;
+    const connection    = server.connection,
+          RequestHelper = server.helpers.request;
     
     class TrailModel {
-        getAll(queryParams) {
+        getAll() {
             let sql = `SELECT trailID, trailname, traildist, trailtime, trailrat
-                       FROM Trail
-                       WHERE 1 = 1 `;
-
-            if(queryParams.trailname) 
-                sql += "AND trailname LIKE '%:trailname%'";
-
-            if(queryParams.trailID)
-                sql += "AND trailID = :trailID";
-
-            if(queryParams.userID)
-                sql += "AND userID = :userID"
-
-            return connection.queryAsync(sql);
+                       FROM Trail`;
+            
+            return RequestHelper.requestToPromise(connection.Request(sql));
         }
         getOne(trailID) {
-            return connection.queryAsync(`
+
+            const sql = `
                 SELECT Trail.trailID, 
-                       Trail.trailname, 
-                       Trail.traildist,
-                       Trail.trailtime, 
-                       Trail.trailrat,
-                       Trail.traildescr,
-                       Trail.mainlat,
-                       Trail.mainlong,
-                       user.name as user,
-                       Trail.dtin,
-                       Trail.dtstamp
+                    Trail.trailname, 
+                    Trail.traildist,
+                    Trail.trailtime, 
+                    Trail.trailrat,
+                    Trail.traildescr,
+                    Trail.mainlat,
+                    Trail.mainlong,
+                    TrailUser.realname as 'user',
+                    Trail.dtin,
+                    Trail.dtstamp
                 FROM Trail
-                INNER JOIN user ON user.trailID = Trail.userID
-                WHERE Trail.trailID = :trailID`
-                , { trailID }
-            )
+                INNER JOIN TrailUser ON TrailUser.userID = Trail.userID
+                WHERE Trail.trailID = @trailID`;
+            
+            const request = connection.Request(sql)
+                                    .addParam('trailID', TYPES.Int, trailID);
+
+            return RequestHelper.requestToPromise(request);
         }
         create(trail) {
-            return connection.queryAsync(`
-                INSERT INTO Trail (trailname, traildist, trailtime, trailrat, traildescr, userID, dtin)
-                VALUES (:trailname, :traildist, :trailtime, :trailrat, :traildescr, :userID, NOW())`
-                , trail)
-            .then( (trail) => {
-                if(trail.insertId) 
-                    return { data: trail.insertId }
+            const sql = `
+                INSERT INTO Trail (trailname, traildist, trailtime, trailrat, traildescr, userID, mainlat, mainlong, dtin, dtstamp)
+                VALUES (@trailname, @traildist, @trailtime, @trailrat, @traildescr, @userID, 0, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+                SELECT @@identity as 'trailID'`;
 
-                return {"message": "Não foi possível criar a trilha"}
-            })
+            const request = connection.Request(sql)
+                                .addParam('trailname', TYPES.VarChar, trail.trailname)
+                                .addParam('traildist', TYPES.Float, trail.traildist)
+                                .addParam('trailtime', TYPES.VarChar, trail.trailtime)
+                                .addParam('trailrat', TYPES.Int, trail.trailrat)
+                                .addParam('traildescr', TYPES.Text, trail.traildescr)
+                                .addParam('userID', TYPES.Int, trail.userID);
+
+            return RequestHelper.requestToPromise(request);
         }
         update(trailID, trail) {
-            return connection.queryAsync(`
+            const sql = `
                 UPDATE Trail
-                SET trailname  = :trailname,
-                    traildist  = :traildist,
-                    trailtime  = :trailtime,
-                    trailrat   = :trailrat,
-                    traildescr = :traildescr
-                    dtstamp    = NOW()
-                WHERE trailID = :trailID 
-            `, Object.assign(trail, { trailID }));
+                SET trailname  = @trailname,
+                    trailrat   = @trailrat,
+                    traildescr = @traildescr,
+                    dtstamp    = CURRENT_TIMESTAMP
+                WHERE trailID = @trailID`;
+
+            const request = connection.Request(sql)
+                                .addParam('trailname', TYPES.VarChar, trail.trailname)
+                                .addParam('trailrat', TYPES.Int, trail.trailrat)
+                                .addParam('traildescr', TYPES.Text, trail.traildescr)
+                                .addParam('trailID', TYPES.Int, trailID);
+            
+            return RequestHelper.requestToPromise(request)
         }
         remove(trailID) {
-            return connection.queryAsync(`
-                DELETE FROM Trail WHERE trailID = :trailID`
-                , { trailID }
-            )
+
+            const sql = 'DELETE FROM Trail WHERE trailID = @trailID';
+
+            const request = connection.Request(sql)
+                                .addParam('trailID', TYPES.Int, trailID);
+
+            return RequestHelper.requestToPromise(request);
         }
     }
 

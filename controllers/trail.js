@@ -6,44 +6,72 @@ module.exports = server => {
     
     class TrailCtrl {
         findAll(req, res) {
-            const queryParams = req.query
-
             TrailModel
-                .getAll(queryParams)
+                .getAll()
                 .then( trails => res.json(trails) )
-                .catch( err => res.status(500).json(err) );
+                .catch( err => res.json(err) );
         }
         findOne(req, res) {
             const { id } = req.params;
 
             TrailModel
                 .getOne(id)
-                .then( trail => res.json(trail) )
-                .catch( err => res.status(500).json(err) );
+                .then(trail => {
+                    if(trail.count) {
+                        PointModel.getPointsOfTrail(trail.rows[0].trailID)
+                            .then( points => {
+                                Object.keys(points).forEach( key => {
+                                    trail.rows[0][key] = points[key];
+                                })
+                                
+                                return PointModel.getPointsOfInterest(trail.rows[0].trailID)
+                            })
+                            .then( points => {
+                                Object.keys(points).forEach( key => {
+                                    trail.rows[0][key] = points[key];
+                                })
+                                res.json(trail);
+                            })
+                    }
+                })
+                .catch( err => res.json(err) );
         }
         create(req, res) {
-            const { trailname, traildist, trailtime, trailrat, traildescr, user_id } = req.query,
+            const { trailname, traildist, trailtime, trailrat, traildescr, userID } = req.query,
                   { trail_points, interest_points } = req.body;
 
             TrailModel
-                .create({ trailname, traildist, trailtime, trailrat, traildescr, user_id })
+                .create({ trailname, traildist, trailtime, trailrat, traildescr, userID })
                 .then( trail => {
-                    if(trail.message)
-                        return trail;
+                    if(trail.rows && trail.rows.length) {
+                        return PointModel
+                            .createPoints(trail.rows[0].trailID, trail_points)
+                            .then(succeed => {
+                                if(succeed[0].count) {
+                                    return PointModel.createInterestPoints(trail.rows[0].trailID, interest_points)
+                                }
+                            })
+                    }
                     
-                    return bluebird.all(
-                        PointModel.createPoints(trail.data, trail_points),
-                        PointModel.createInterestPoints(trail.data, interest_points)
-                    );
+                    return { message: "Não foi possível cadastrar a trilha desejada", count: 0 };
                 })
-                .then( succeed => res.status(201).json(succeed) )
-                .catch( err => res.status(500).json(err) );
+                .then( result => {
+                    if(result.message) 
+                        return res.json(result);
+
+                    res.json({ data: "Trilha cadastrada com sucesso!", count: 1 });
+                })
+                .catch( err => {
+                    console.log(err);
+                    res.json(err)
+                });
         }
         update(req, res) {
-            const { id } = req.params;
+            const { id } = req.params,
+                  { trailname, trailrat, traildescr } = req.query;
 
             TrailModel
-                .update(id, req.body)
+                .update(id, { trailname, trailrat, traildescr })
                 .then( succeed => res.json(succeed) )
                 .catch( err => res.status(500).json(err) );
         }

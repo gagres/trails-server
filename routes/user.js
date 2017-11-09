@@ -10,8 +10,10 @@ module.exports = server => {
         .put(UserCtrl.update)
         .delete(UserCtrl.remove);
 
-    server.get('/user/:userID/ativar', UserCtrl.ativarUsuario);
-    server.get('/user/:userID/inativar', UserCtrl.inativarUsuario);
+    server.put('/user/:userID/ativar', UserCtrl.ativarUsuario);
+    server.put('/user/:userID/inativar', UserCtrl.inativarUsuario);
+
+    server.post('/user/:priUserID/follow', UserCtrl.followOtherUser);
 
     server.post('/login', UserCtrl.login);
 }

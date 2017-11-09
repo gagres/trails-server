@@ -28,22 +28,6 @@ module.exports = app => {
 
 
     class Connection {
-        constructor() {
-            this.currentConnect = {
-                errorHandler: null,
-                connectedHandler: null
-            };
-        }
-        
-        onConnected(callback) {
-            this.currentConnect.connectedHandler = callback;
-            return this;
-        }
-        onError(callback) {
-            this.currentConnect.errorHandler = callback;
-            return this;
-        }
-
         Request(sql) {
             let currentRequest = this;
             currentRequest.sql = sql;

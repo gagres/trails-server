@@ -8,7 +8,6 @@ module.exports = server => {
     
     class UserModel {
         constructor() {
-            this.connection = server.connection; // Conexão com a base de dados
             bluebird.promisify(this.encryptUserPasswd); // Transforma a função em uma promisse
         }
         findAll() {
@@ -16,7 +15,7 @@ module.exports = server => {
                 SELECT userID, realname, username, age, email
                 FROM TrailUser`;
 
-            return RequestHelper.requestToPromise(this.connection.Request(sql));
+            return RequestHelper.requestToPromise(connection.Request(sql));
         }
         find(id) {
             const sql = `
@@ -24,9 +23,24 @@ module.exports = server => {
                 FROM TrailUser
                 WHERE userID = @userID`;
 
-            const request = this.connection.Request(sql)
+            const request = connection.Request(sql)
                                 .addParam('userID', TYPES.Int, id);
 
+            return RequestHelper.requestToPromise(request);
+        }
+        findFollowFriends(userID) {
+            const sql = `
+                SELECT TrailUser.userID,
+                       TrailUser.realname,
+                       TrailUser.username,
+                       TrailUser.age
+                FROM UserFollow
+                INNER JOIN TrailUser ON TrailUser.userID = UserFollow.priUserID
+                WHERE UserFollow.userID = @userID`;
+
+            const request = connection.Request(sql)
+                                .addParam('userID', TYPES.Int, userID);
+            
             return RequestHelper.requestToPromise(request);
         }
         create(user) {
@@ -39,7 +53,7 @@ module.exports = server => {
                         INSERT INTO TrailUser (realname, username, age, passwd, email, dtin, dtstamp, decription) 
                         VALUES (@realname, @username, @age, @passwd, @email, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '')`;
 
-                    const request = this.connection.Request(sql)
+                    const request = connection.Request(sql)
                                         .addParam('realname', TYPES.VarChar, user.realname)
                                         .addParam('username', TYPES.VarChar, user.username)
                                         .addParam('age', TYPES.Int, user.age)
@@ -64,7 +78,7 @@ module.exports = server => {
                             dtstamp = CURRENT_TIMESTAMP
                         WHERE userID = @userID`;
 
-                    let request = this.connection.Request(sql)
+                    let request = connection.Request(sql)
                                         .addParam('realname', TYPES.VarChar, user.realname)
                                         .addParam('username', TYPES.VarChar, user.username)
                                         .addParam('age', TYPES.Int, user.age)
@@ -82,7 +96,7 @@ module.exports = server => {
         remove(id, passwd) {
             const sql = `SELECT passwd FROM TrailUser WHERE userID = @userID`;
 
-            const request = this.connection.Request(sql)
+            const request = connection.Request(sql)
                                 .addParam('userID', TYPES.Int, id);
 
             return RequestHelper.requestToPromise(request);
@@ -90,15 +104,24 @@ module.exports = server => {
         login(email) {
             const sql = `SELECT passwd FROM TrailUser WHERE email = @email`;
 
-            const request = this.connection.Request(sql)
+            const request = connection.Request(sql)
                                 .addParam('email', TYPES.VarChar, email);
 
+            return RequestHelper.requestToPromise(request);
+        }
+        followOtherUser(userID, priUserID) {
+            const sql = "INSERT INTO UserFollow (userID, priUserID) VALUES (@userID, @priUserID)";
+
+            const request = connection.Request(sql)
+                                .addParam('userID', TYPES.Int, userID)
+                                .addParam('priUserID', TYPES.Int, priUserID);
+            
             return RequestHelper.requestToPromise(request);
         }
         mudarStatusUsuario(id, status) {
             const sql = `UPDATE TrailUser SET active = @active WHERE userID = @userID`;
             
-            const request = this.connection.Request(sql)
+            const request = connection.Request(sql)
                                 .addParam('active', TYPES.Bit, status)
                                 .addParam('userID', TYPES.Int, id);
             
