@@ -29,7 +29,7 @@ module.exports = server => {
                 .catch( err => res.json(err) );
         }
         /**
-         * @api {get} /trail/:trailID Get All
+         * @api {get} /trail/:trailID Get One
          * @apiGroup Trail
          * @apiDescription Retorna a trilha selecionada, seus pontos normais e de interesse
          * @apiParam {Number} trailID ID da trilha
@@ -103,7 +103,14 @@ module.exports = server => {
          * @apiParam {json[]} interest_points Pontos de interesse da trilha
          * @apiParamExample {json} Request-Params
          *      http://localhost:3000/trails?trailname=Trilha de exemplo&traildist=1.27&trailtime=00:15:00&trailrat=5&traildescr=&userID=1
-         *      body: { trail_points: [], interest_points: [] }
+         *      body: {
+         *          trail_points: [
+         *              { latitude: 0.0000000, longitude: 0.00000000 }
+         *          ], 
+         *          interest_points: [
+         *              { latitude: 0.0000000, longitude: 0.00000000, typeOfPoint: 1 }
+         *          ] 
+         *      }
          * 
          * @apiUse DefaultSuccess
          * @apiSuccessExample {json} Response-Success

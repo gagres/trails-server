@@ -1,7 +1,7 @@
 logDirectory: iisnode
-loggingEnabled: true
-debuggingEnabled: true
-devErrorsEnabled: true
+loggingEnabled: false
+debuggingEnabled: false
+devErrorsEnabled: false
 node_env: production
 nodeProcessCountPerApplication: 1
 maxConcurrentRequestsPerProcess: 1024
