@@ -1,5 +1,6 @@
 module.exports = server => {
-    const UserModel = server.models.user;
+    const UserModel  = server.models.user;
+    const TrailMOdel = server.models.trail; 
 
     /**
      * @apiDefine DefaultSuccess

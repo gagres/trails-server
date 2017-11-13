@@ -130,7 +130,7 @@
   {
     "type": "get",
     "url": "/trail/:trailID",
-    "title": "Get All",
+    "title": "Get One",
     "group": "Trail",
     "description": "<p>Retorna a trilha selecionada, seus pontos normais e de interesse</p>",
     "parameter": {
@@ -303,7 +303,7 @@
       "examples": [
         {
           "title": "Request-Params",
-          "content": "http://localhost:3000/trails?trailname=Trilha de exemplo&traildist=1.27&trailtime=00:15:00&trailrat=5&traildescr=&userID=1\nbody: { trail_points: [], interest_points: [] }",
+          "content": "http://localhost:3000/trails?trailname=Trilha de exemplo&traildist=1.27&trailtime=00:15:00&trailrat=5&traildescr=&userID=1\nbody: {\n    trail_points: [\n        { latitude: 0.0000000, longitude: 0.00000000 }\n    ], \n    interest_points: [\n        { latitude: 0.0000000, longitude: 0.00000000, typeOfPoint: 1 }\n    ] \n}",
           "type": "json"
         }
       ]

@@ -9,7 +9,7 @@ const express     = require('express'),
 
 module.exports = app => {
 
-    app.set(express.static(__dirname + '/assets'));
+    app.use('/assets', express.static(path.resolve(__dirname, '../', 'assets/')));
     app.use('/apidoc', express.static(path.resolve(__dirname, '../', 'apidoc/')));
 
     // Configurações da aplicação
