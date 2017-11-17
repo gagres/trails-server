@@ -1,8 +1,9 @@
 const bluebird   = require('bluebird');
 
 module.exports = server => {
-    const PointModel  = server.models.point,
-          TrailModel = server.models.trail;
+    const PointModel         = server.models.point,
+          TrailModel         = server.models.trail,
+          TrailActivityModel = server.models.trailActivity;
 
     /**
      * @apiDefine DefaultSuccess
@@ -59,7 +60,8 @@ module.exports = server => {
          *                  ],
          *                  "interest_points": [
          *                      { pointID: 1, latitude: 34.093888, longitude: -118.3640725, type: "Tipo 01", description: "" }
-         *                  ]
+         *                  ],
+         *                  activity: []
          *              }
          *          ]
          *      }
@@ -83,9 +85,16 @@ module.exports = server => {
                                 Object.keys(points).forEach( key => {
                                     trail.rows[0][key] = points[key];
                                 })
+                                
+                                return TrailActivityModel.getTrailActivityByTrail(trailID);
+                            })
+                            .then( activity => {
+                                trail.rows[0].activity = activity.rows;
+                                
                                 res.json(trail);
                             })
-                    }
+                    } else
+                        res.json({ count: 0, rows: [] })
                 })
                 .catch( err => res.json(err) );
         }
@@ -133,20 +142,31 @@ module.exports = server => {
                             .then(succeed => {
                                 if(succeed[0].count) {
                                     return PointModel.createInterestPoints(trail.rows[0].trailID, interest_points)
+                                                .catch( err => {
+                                                    throw { err, message: 'Erro ao criar os pontos de interesse' }
+                                                });
                                 }
                             })
+                            .then(succeed => {
+                                if(succeed[0].count) {
+                                    const trailID = trail.rows[0].trailID;
+                                    return TrailActivityModel.create({ userID, trailID, trailrat, trailtime })
+                                                .catch( err => {
+                                                    throw { err, message: 'Erro na criação da atividade da trilha' }
+                                                });
+                                }
+                            })
+                            .catch( err => {
+                                throw err;
+                            });
                     }
                     
-                    return { message: "Não foi possível cadastrar a trilha desejada", count: 0 };
+                    throw { message: "Não foi possível cadastrar a trilha desejada", count: 0 };
                 })
                 .then( result => {
-                    if(result.message) 
-                        return res.json(result);
-
                     res.json({ data: "Trilha cadastrada com sucesso!", count: 1 });
                 })
                 .catch( err => {
-                    console.log(err);
                     res.json(err)
                 });
         }
@@ -176,10 +196,10 @@ module.exports = server => {
             TrailModel
                 .update(trailID, { trailname, traildescr, trailrat })
                 .then( succeed => res.json(succeed) )
-                .catch( err => res.status(500).json(err) );
+                .catch( err => res.json(err) );
         }
         /**
-         * @api {delete} /trail/:trailID Remove
+         * @api {delete} /trail/:trailID Remove (Disabled)
          * @apiGroup Trail
          * @apiDescription Remove a trilha escolhida
          * @apiParam {Number} trailID ID da trilha
@@ -200,7 +220,35 @@ module.exports = server => {
             TrailModel
                 .remove(trailID)
                 .then( succeed => res.json(succeed) )
-                .catch( err => res.status(500).json(err) );
+                .catch( err => res.json(err) );
+        }
+        /**
+         * @api {post} /trail/:trailID/realizar PerformTrail
+         * @apiGroup Trail
+         * @apiDescription O usuário pode realizar uma trilha ja criada por outro
+         * @apiParam {Number} userID ID do usuário que está realizando
+         * @apiParam {Number} trailID ID da trilha realizada
+         * @apiParam {Number} trailrat Avaliação do usuário para a trilha
+         * @apiParam {String} trailtime Tempo do usuário na trilha
+         * @apiParamExample {json} Request-Example
+         *      http://localhost:3000/trail/1/realizar?userID=1&trailID=1&trailrat=5&trailtime=02:00:00
+         * 
+         * @apiUse DefaultSuccess
+         * @apiSuccessExample {json} Response-Success
+         *      HTTP/1.1 200 OK
+         *      {
+         *          count: 1,
+         *          rows: []
+         *      }
+         */
+        performTrail(req, res) {
+            const { trailID } = req.params,
+                  { userID, trailrat, trailtime } = req.query;
+
+            TrailActivityModel
+                .create({ userID, trailID, trailrat, trailtime })
+                .then( succeed => res.json(succeed) )
+                .catch( err => res.json(err) );
         }
         
     }

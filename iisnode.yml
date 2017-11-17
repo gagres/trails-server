@@ -1,4 +1,4 @@
-logDirectory: iisnode
+# logDirectory: iisnode
 loggingEnabled: false
 debuggingEnabled: false
 devErrorsEnabled: false
@@ -15,7 +15,7 @@ maxNamedPipePooledConnectionAge: 30000
 # watchedFiles: *.js;iisnode.yml;node_modules\*
 # uncFileChangesPollingInterval: 5000
 # gracefulShutdownTimeout: 60000
-logDirectoryNameSuffix: logs
+# logDirectoryNameSuffix: logs
 # debuggerPortRange: 5058-6058
 # debuggerPathSegment: debug
 # maxLogFileSizeInKB: 128

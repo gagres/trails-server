@@ -118,6 +118,15 @@ module.exports = server => {
             
             return RequestHelper.requestToPromise(request);
         }
+        unfollowOtherUser(userID, priUserID) {
+            const sql = "DELETE FROM UserFollow WHERE userID = @userID AND priUserID = @priUserID";
+
+            const request = connection.Request(sql)
+                                .addParam('userID', TYPES.Int, userID)
+                                .addParam('priUserID', TYPES.Int, priUserID);
+
+            return RequestHelper.requestToPromise(request);
+        }
         mudarStatusUsuario(id, status) {
             const sql = `UPDATE TrailUser SET active = @active WHERE userID = @userID`;
             

@@ -67,7 +67,7 @@
   {
     "type": "delete",
     "url": "/trail/:trailID",
-    "title": "Remove",
+    "title": "Remove (Disabled)",
     "group": "Trail",
     "description": "<p>Remove a trilha escolhida</p>",
     "parameter": {
@@ -157,7 +157,7 @@
       "examples": [
         {
           "title": "Response-Success",
-          "content": "HTTP/1.1 200 OK\n{\n    count: 1,\n    rows: [\n        {\n            trailID: 1,\n            trailname: \"Trilha de exemplo\",\n            traildist: 1.27,\n            trailtime: \"1970-01-01T00:15:00.000Z\",\n            trailrat: 5,\n            traildescr: \"\",\n            mainlat: 0,\n            mainlong: 0,\n            user: \"Example\",\n            dtin: \"2017-11-09T00:00:00.000Z\",\n            dtstamp: \"2017-11-09T01:21:28.330Z\",\n            \"trail_points\": [\n                { pointID: 1, latitude: 34.093888, longitude: -118.3640725 }\n            ],\n            \"interest_points\": [\n                { pointID: 1, latitude: 34.093888, longitude: -118.3640725, type: \"Tipo 01\", description: \"\" }\n            ]\n        }\n    ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    count: 1,\n    rows: [\n        {\n            trailID: 1,\n            trailname: \"Trilha de exemplo\",\n            traildist: 1.27,\n            trailtime: \"1970-01-01T00:15:00.000Z\",\n            trailrat: 5,\n            traildescr: \"\",\n            mainlat: 0,\n            mainlong: 0,\n            user: \"Example\",\n            dtin: \"2017-11-09T00:00:00.000Z\",\n            dtstamp: \"2017-11-09T01:21:28.330Z\",\n            \"trail_points\": [\n                { pointID: 1, latitude: 34.093888, longitude: -118.3640725 }\n            ],\n            \"interest_points\": [\n                { pointID: 1, latitude: 34.093888, longitude: -118.3640725, type: \"Tipo 01\", description: \"\" }\n            ],\n            activity: []\n        }\n    ]\n}",
           "type": "json"
         },
         {
@@ -232,6 +232,90 @@
     "filename": "controllers/trail.js",
     "groupTitle": "Trail",
     "name": "GetTrails"
+  },
+  {
+    "type": "post",
+    "url": "/trail/:trailID/realizar",
+    "title": "PerformTrail",
+    "group": "Trail",
+    "description": "<p>O usuário pode realizar uma trilha ja criada por outro</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "userID",
+            "description": "<p>ID do usuário que está realizando</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "trailID",
+            "description": "<p>ID da trilha realizada</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "trailrat",
+            "description": "<p>Avaliação do usuário para a trilha</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "trailtime",
+            "description": "<p>Tempo do usuário na trilha</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example",
+          "content": "http://localhost:3000/trail/1/realizar?userID=1&trailID=1&trailrat=5&trailtime=02:00:00",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Response-Success",
+          "content": "HTTP/1.1 200 OK\n{\n    count: 1,\n    rows: []\n}",
+          "type": "json"
+        },
+        {
+          "title": "Respose-Success",
+          "content": "HTTP/1.1 200 OK\n{\n    count: 1,\n    rows: []\n}",
+          "type": "json"
+        }
+      ],
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "count",
+            "description": "<p>Quantidade de registros retornados</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "json[]",
+            "optional": false,
+            "field": "rows",
+            "description": "<p>Registros retornados</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "controllers/trail.js",
+    "groupTitle": "Trail",
+    "name": "PostTrailTrailidRealizar"
   },
   {
     "type": "post",
@@ -432,7 +516,7 @@
   {
     "type": "delete",
     "url": "/user/:userID",
-    "title": "Remove User",
+    "title": "Remove (Disabled)",
     "group": "User",
     "description": "<p>Remove o usuário do sistema</p>",
     "parameter": {
@@ -540,7 +624,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n    count: 1,\n    rows: [\n        { \n            userID: 1,\n            realname: \"Example\",\n            username: \"example\",\n            age: 20,\n            email: \"example@example.com\",\n            dtin: \"2017-11-08T00:00:00.000Z\",\n            dtstamp: \"2017-11-08T10:05:26.423Z\",\n            active: true,\n            description: '',\n            following: []\n        }\n    ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n    count: 1,\n    rows: [\n        { \n            userID: 1,\n            realname: \"Example\",\n            username: \"example\",\n            age: 20,\n            email: \"example@example.com\",\n            dtin: \"2017-11-08T00:00:00.000Z\",\n            dtstamp: \"2017-11-08T10:05:26.423Z\",\n            active: true,\n            description: '',\n            following: [],\n            activity: [],\n            analytics: []\n        }\n    ]\n}",
           "type": "json"
         }
       ]
@@ -590,7 +674,7 @@
   },
   {
     "type": "post",
-    "url": "/user/:priUserID/follow",
+    "url": "/user/:userID/follow/:priUserID",
     "title": "Follow User",
     "group": "User",
     "description": "<p>Segue outro usuário no sistema</p>",
@@ -601,22 +685,22 @@
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "priUserID",
-            "description": "<p>ID do usuário a ser seguido</p>"
+            "field": "userID",
+            "description": "<p>ID do usuário que executa a ação</p>"
           },
           {
             "group": "Parameter",
             "type": "Number",
             "optional": false,
-            "field": "userID",
-            "description": "<p>ID do usuário que executa a ação</p>"
+            "field": "priUserID",
+            "description": "<p>ID do usuário a ser seguido</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Request-Params",
-          "content": "http://localhost:3000/user/2/follow?userID=1",
+          "content": "http://localhost:3000/user/1/follow/2",
           "type": "json"
         }
       ]
@@ -656,12 +740,82 @@
     "version": "0.0.0",
     "filename": "controllers/user.js",
     "groupTitle": "User",
-    "name": "PostUserPriuseridFollow"
+    "name": "PostUserUseridFollowPriuserid"
+  },
+  {
+    "type": "post",
+    "url": "/user/:userID/unfollow/:priUserID",
+    "title": "Unfollow User",
+    "group": "User",
+    "description": "<p>Para de seguir o usuário escolhido</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "userID",
+            "description": "<p>ID do usuário que executa a ação</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "priUserID",
+            "description": "<p>ID do usuário que deseja parar de seguir</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Params",
+          "content": "http://localhost:3000/user/1/unfollow/2",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Respose-Success",
+          "content": "HTTP/1.1 200 OK\n{\n    count: 1,\n    rows: []\n}",
+          "type": "json"
+        },
+        {
+          "title": "Respose-Success",
+          "content": "HTTP/1.1 200 OK\n{\n    count: 1,\n    rows: []\n}",
+          "type": "json"
+        }
+      ],
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "count",
+            "description": "<p>Quantidade de registros retornados</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "json[]",
+            "optional": false,
+            "field": "rows",
+            "description": "<p>Registros retornados</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "controllers/user.js",
+    "groupTitle": "User",
+    "name": "PostUserUseridUnfollowPriuserid"
   },
   {
     "type": "post",
     "url": "/users",
-    "title": "Create User",
+    "title": "Create",
     "group": "User",
     "description": "<p>Cria um novo usuário no sistema</p>",
     "parameter": {
@@ -752,7 +906,7 @@
   {
     "type": "put",
     "url": "/user/:userID",
-    "title": "Update User",
+    "title": "Update",
     "group": "User",
     "description": "<p>Atualiza um usuário do sistema</p>",
     "parameter": {
@@ -850,7 +1004,7 @@
   {
     "type": "put",
     "url": "/user/:userID/ativar",
-    "title": "Active User",
+    "title": "Active",
     "group": "User",
     "description": "<p>Altera o estado do usuário para &quot;Ativo&quot;</p>",
     "parameter": {
@@ -913,7 +1067,7 @@
   {
     "type": "put",
     "url": "/user/:userID/inativar",
-    "title": "Inactive User",
+    "title": "Inactive",
     "group": "User",
     "description": "<p>Altera o estado do usuário para &quot;Inativo&quot;</p>",
     "parameter": {

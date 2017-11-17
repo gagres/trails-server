@@ -1,6 +1,6 @@
 module.exports = server => {
-    const UserModel  = server.models.user;
-    const TrailMOdel = server.models.trail; 
+    const UserModel          = server.models.user,
+          TrailActivityModel = server.models.trailActivity;
 
     /**
      * @apiDefine DefaultSuccess
@@ -62,7 +62,9 @@ module.exports = server => {
          *                  dtstamp: "2017-11-08T10:05:26.423Z",
          *                  active: true,
          *                  description: '',
-         *                  following: []
+         *                  following: [],
+         *                  activity: [],
+         *                  analytics: []
          *              }
          *          ]
          *      }
@@ -79,6 +81,16 @@ module.exports = server => {
                             .then( follows => {
                                 user.rows[0].following = follows.rows;
 
+                                return TrailActivityModel.getTrailActivityByUser(userID)
+                            })
+                            .then( activity => {
+                                user.rows[0].activity = activity.rows;
+
+                                return TrailActivityModel.getAnalyticsByUser(userID)
+                            })
+                            .then( analytics => {
+                                user.rows[0].analytics = analytics.rows;
+
                                 res.json(user);
                             })
                     }
@@ -88,7 +100,7 @@ module.exports = server => {
                 .catch( err => res.json(err) );
         }
         /**
-         * @api {post} /users Create User
+         * @api {post} /users Create
          * @apiGroup User
          * @apiDescription Cria um novo usuário no sistema
          * @apiParam {String} realname Nome do usuário
@@ -116,7 +128,7 @@ module.exports = server => {
                 .catch( err => res.json(err) );
         }
         /**
-         * @api {put} /user/:userID Update User
+         * @api {put} /user/:userID Update
          * @apiGroup User
          * @apiDescription Atualiza um usuário do sistema
          * @apiParam {Number} ID do usuário desejado
@@ -147,7 +159,7 @@ module.exports = server => {
                 .catch( err => res.json(err) );
         }
         /**
-         * @api {put} /user/:userID/ativar Active User
+         * @api {put} /user/:userID/ativar Active
          * @apiGroup User
          * @apiDescription Altera o estado do usuário para "Ativo"
          * @apiParam {Number} userID ID do usuário
@@ -171,7 +183,7 @@ module.exports = server => {
                 .catch( err => res.json(err) );
         }
         /**
-         * @api {put} /user/:userID/inativar Inactive User
+         * @api {put} /user/:userID/inativar Inactive
          * @apiGroup User
          * @apiDescription Altera o estado do usuário para "Inativo"
          * @apiParam {Number} userID ID do usuário
@@ -195,7 +207,7 @@ module.exports = server => {
                 .catch( err => res.json(err) );
         }
         /**
-         * @api {delete} /user/:userID Remove User
+         * @api {delete} /user/:userID Remove (Disabled)
          * @apiGroup User
          * @apiDescription Remove o usuário do sistema
          * @apiParam {Number} userID ID do usuário
@@ -264,13 +276,13 @@ module.exports = server => {
 
         }
         /**
-         * @api {post} /user/:priUserID/follow Follow User
+         * @api {post} /user/:userID/follow/:priUserID Follow User
          * @apiGroup User
          * @apiDescription Segue outro usuário no sistema
-         * @apiParam {Number} priUserID ID do usuário a ser seguido
          * @apiParam {Number} userID ID do usuário que executa a ação
+         * @apiParam {Number} priUserID ID do usuário a ser seguido
          * @apiParamExample {json} Request-Params
-         *      http://localhost:3000/user/2/follow?userID=1
+         *      http://localhost:3000/user/1/follow/2
          * 
          * @apiUse DefaultSuccess
          * @apiSuccessExample {json} Respose-Success
@@ -281,11 +293,35 @@ module.exports = server => {
          *      } 
          */
         followOtherUser(req, res) {
-            const { priUserID } = req.params,
-                  { userID }    = req.query;
+            const { userID, priUserID } = req.params;
 
             UserModel
                 .followOtherUser(userID, priUserID)
+                .then( succeed => res.json(succeed) )
+                .catch( err => res.json(err) );
+        }
+        /**
+         * @api {post} /user/:userID/unfollow/:priUserID Unfollow User
+         * @apiGroup User
+         * @apiDescription Para de seguir o usuário escolhido
+         * @apiParam {Number} userID ID do usuário que executa a ação
+         * @apiParam {Number} priUserID ID do usuário que deseja parar de seguir
+         * @apiParamExample {json} Request-Params
+         *      http://localhost:3000/user/1/unfollow/2
+         * 
+         * @apiUse DefaultSuccess
+         * @apiSuccessExample {json} Respose-Success
+         *      HTTP/1.1 200 OK
+         *      {
+         *          count: 1,
+         *          rows: []
+         *      } 
+         */
+        unfollowOtherUser(req, res) {
+            const { userID, priUserID } = req.params;
+
+            UserModel
+                .unfollowOtherUser(userID, priUserID)
                 .then( succeed => res.json(succeed) )
                 .catch( err => res.json(err) );
         }

@@ -10,6 +10,8 @@ module.exports = server => {
     server
         .route('/trail/:trailID')
         .get(TrailCtrl.findOne)
-        .put(TrailCtrl.update)
-        .delete(TrailCtrl.remove)
+        .put(TrailCtrl.update);
+        // .delete(TrailCtrl.remove);
+
+    server.post('/trail/:trailID/realizar', TrailCtrl.performTrail);
 }
