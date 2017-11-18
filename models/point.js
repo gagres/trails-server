@@ -46,26 +46,27 @@ module.exports = server => {
                 INSERT INTO PointOfTrail (latitude, longitude, trailID, dtstamp)
                 VALUES (@latitude, @longitude, @trailID, CURRENT_TIMESTAMP)`;
 
-            let pointPromises = [];
+            let pointRequests = [];
 
             for(let point of points) {
-
                 const request = connection.Request(sql)
                                     .addParam('latitude', TYPES.Float, point.latitude)
                                     .addParam('longitude', TYPES.Float, point.longitude)
                                     .addParam('trailID', TYPES.Int, trailID);
 
-                pointPromises.push(RequestHelper.requestToPromise(request));
+                pointRequests.push(request);
             }
 
-            return bluebird.all(pointPromises);
+            return bluebird.mapSeries(pointRequests, (request) => {
+                return RequestHelper.requestToPromise(request);
+            })
         }
         createInterestPoints(trailID, interest_points) {
             const sql = `
                 INSERT INTO PointOfInterest (latitude, longitude, pointTypeID, trailID, dtstamp)
                 VALUES (@latitude, @longitude, @pointTypeID, @trailID, CURRENT_TIMESTAMP)`;
 
-            let pointPromises = [];
+            let pointRequests = [];
 
             for(let point of interest_points) {
 
@@ -75,10 +76,12 @@ module.exports = server => {
                                     .addParam('pointTypeID', TYPES.Int, point.pointTypeID)
                                     .addParam('trailID', TYPES.Int, trailID);
 
-                pointPromises.push(RequestHelper.requestToPromise(request));
+                pointRequests.push(request);
             }
 
-            return bluebird.all(pointPromises);
+            return bluebird.mapSeries(pointRequests, (request) => {
+                return RequestHelper.requestToPromise(request);
+            })
         }
     }
 

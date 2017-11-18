@@ -167,6 +167,7 @@ module.exports = server => {
                     res.json({ data: "Trilha cadastrada com sucesso!", count: 1 });
                 })
                 .catch( err => {
+                    console.log(err);
                     res.json(err)
                 });
         }

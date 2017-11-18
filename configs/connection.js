@@ -22,7 +22,6 @@ module.exports = app => {
             console.log("Conectado ao banco de dados");
         })
         .catch((err) => {
-            console.log(err);
             throw 'Não foi possível estabelecer a conexão com o Banco de Dados'
         })
 

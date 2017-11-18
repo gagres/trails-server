@@ -10,7 +10,7 @@ const requestToPromise = (request) => {
                 reject(err);
             })
             .Run();
-    });
+    })
 }
 
 // Exports of the module
