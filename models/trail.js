@@ -7,7 +7,7 @@ module.exports = server => {
     
     class TrailModel {
         getAll() {
-            let sql = `SELECT trailID, trailname, traildist, trailtime, trailrat
+            let sql = `SELECT trailID, trailname, traildist, trailtime, trailrat, dtin
                        FROM Trail`;
             
             return RequestHelper.requestToPromise(connection.Request(sql));

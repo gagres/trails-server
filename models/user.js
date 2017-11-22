@@ -12,7 +12,7 @@ module.exports = server => {
         }
         findAll() {
             const sql = `
-                SELECT userID, realname, username, age, email
+                SELECT userID, realname, username, age, email, active, dtin, dtstamp
                 FROM TrailUser`;
 
             return RequestHelper.requestToPromise(connection.Request(sql));

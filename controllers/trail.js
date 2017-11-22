@@ -117,7 +117,7 @@ module.exports = server => {
          *              { latitude: 0.0000000, longitude: 0.00000000 }
          *          ], 
          *          interest_points: [
-         *              { latitude: 0.0000000, longitude: 0.00000000, typeOfPoint: 1 }
+         *              { latitude: 0.0000000, longitude: 0.00000000, pointTypeID: 1 }
          *          ] 
          *      }
          * 

@@ -5,7 +5,8 @@
   "url" : "https://localhost:3000/",
   "main": "index.js",
   "scripts": {
-    "start": "node_modules/.bin/nodemon app.js",
+    "start": "node app.js",
+    "dev": "node_modules/.bin/nodemon app.js",
     "test": "mocha 'test/**/*.js' --timeout 10000",
     "check": "node_modules/.bin/nsp check",
     "doc": "apidoc -i controllers/ -o apidoc/"
